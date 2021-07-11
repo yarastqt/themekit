@@ -1,7 +1,7 @@
-import type { Context, Filter, Format, Transform } from './types'
+import type { Context, ContextValue } from './types'
 
-export function createContext() {
-  const context: Context = {
+export function createContext(): Context {
+  const context: ContextValue = {
     filters: new Map(),
     formats: new Map(),
     transforms: new Map(),
@@ -9,13 +9,13 @@ export function createContext() {
 
   return {
     value: context,
-    registerFilter: (filter: Filter) => {
+    registerFilter: (filter) => {
       context.filters.set(filter.name, filter)
     },
-    registerFormat: (format: Format) => {
+    registerFormat: (format) => {
       context.formats.set(format.name, format)
     },
-    registerTransform: (transform: Transform) => {
+    registerTransform: (transform) => {
       context.transforms.set(transform.name, transform)
     },
   }

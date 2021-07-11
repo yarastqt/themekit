@@ -1,4 +1,11 @@
 export interface Context {
+  value: ContextValue
+  registerFilter: (filter: Filter) => void
+  registerFormat: (format: Format) => void
+  registerTransform: (transform: Transform) => void
+}
+
+export interface ContextValue {
   /**
    * List of registered transforms.
    */
@@ -41,7 +48,7 @@ export interface TokenBase extends RawToken {
   value: TokenValue
   path: string[]
   attributes: Record<string, any>
-  refs: any[]
+  refs: Pick<TokenBase, 'value' | 'name'>[]
 }
 
 export interface Token extends TokenBase {

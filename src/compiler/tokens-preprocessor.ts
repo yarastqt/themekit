@@ -1,4 +1,4 @@
-import type { Context, Token } from '../types'
+import type { ContextValue, Token } from '../types'
 import {
   NotFoundFilterException,
   NotFoundFormatException,
@@ -23,7 +23,7 @@ export interface PreprocessorOptions extends Options {
  * @param context - Programm context.
  * @returns Preprocessed tokens.
  */
-export function preprocessTokens(options: PreprocessorOptions, context: Context) {
+export function preprocessTokens(options: PreprocessorOptions, context: ContextValue) {
   const result: PreprocessorResult = {}
 
   for (const output of Object.entries(options.output)) {
