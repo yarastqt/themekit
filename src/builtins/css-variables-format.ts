@@ -17,6 +17,10 @@ interface CssVariablesFormatOptions {
    * }
    */
   useAliasVariables?: boolean
+  /**
+   * Enable comments.
+   */
+  useComments?: boolean
 }
 
 /**
@@ -25,19 +29,21 @@ interface CssVariablesFormatOptions {
 export const formatToCssVariables: Format<CssVariablesFormatOptions> = {
   name: 'css/variables',
   formatter: ({ tokens, options, context = {} }) => {
-    const defaultOptions = { selector: ':root', useAliasVariables: false }
-    const { selector: originalSelector, useAliasVariables } = { ...defaultOptions, ...options }
+    const defaultOptions = { selector: ':root' }
+    const { selector: originalSelector, ...otherOptions } = { ...defaultOptions, ...options }
     const { entry, platform } = context
 
     const selector = originalSelector
       .replace(/\[entry\]/g, entry)
       .replace(/\[platform\]/g, platform)
 
-    return `${selector} {\n${variablesWithPrefix(tokens, useAliasVariables)}\n}\n`
+    return `${selector} {\n${variablesWithPrefix(tokens, otherOptions)}\n}\n`
   },
 }
 
-function variablesWithPrefix(tokens: Token[], useAliasVariables: boolean): string {
+function variablesWithPrefix(tokens: Token[], options: CssVariablesFormatOptions): string {
+  const { useAliasVariables, useComments } = options
+
   const tokenToString = (token: Token) => {
     if (useAliasVariables && token.refs.length > 0) {
       for (const ref of token.refs) {
@@ -45,10 +51,10 @@ function variablesWithPrefix(tokens: Token[], useAliasVariables: boolean): strin
       }
     }
 
-    const nextProp = [`--${token.name}: ${token.value};`]
+    const nextProp = [`  --${token.name}: ${token.value};`]
 
-    if (token.comment) {
-      nextProp.push(` /* ${token.comment} /*`)
+    if (useComments && token.comment) {
+      nextProp.push(` /* ${token.comment} */`)
     }
 
     return nextProp.join('')

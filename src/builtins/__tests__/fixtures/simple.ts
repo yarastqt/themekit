@@ -3,6 +3,7 @@ import type { Token } from '../../../types'
 export const tokens: Token[] = [
   {
     attributes: {},
+    comment: 'comment',
     name: 'token-1',
     original: { value: '{token-2.value} {token-3.value}' },
     path: [],
