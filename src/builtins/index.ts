@@ -2,6 +2,7 @@ import type { Context } from '../types'
 
 // All builtin formats.
 import { formatToCssVariables } from './css-variables-format'
+import { formatToFlatJson } from './flat-json-format'
 // All builtin transformers.
 import { transformNameToKebabCase } from './name-kebab-transform'
 import { transformValueWithColorFn } from './value-color-function-transform'
@@ -15,6 +16,7 @@ import { cssPreset } from './css-preset'
 export function registerBuiltins(context: Context) {
   // Register builins formats.
   context.registerFormat(formatToCssVariables)
+  context.registerFormat(formatToFlatJson)
 
   // Register builins transforms.
   context.registerTransform(transformNameToKebabCase)
