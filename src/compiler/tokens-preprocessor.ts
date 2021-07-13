@@ -51,7 +51,7 @@ export function preprocessTokens(options: PreprocessorOptions, context: ContextV
       }
 
       for (const token of options.tokens) {
-        token[transform.type] = transform.transformer({ token, context })
+        token[transform.type] = transform.transformer({ token, context: options.context })
       }
     }
 
@@ -72,7 +72,9 @@ export function preprocessTokens(options: PreprocessorOptions, context: ContextV
         }
 
         content = format.formatter({
-          tokens: options.tokens.filter((token) => filter.matcher({ token, context })),
+          tokens: options.tokens.filter((token) =>
+            filter.matcher({ token, context: options.context }),
+          ),
           options: file.options,
           context: options.context,
         })
