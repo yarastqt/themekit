@@ -3,6 +3,7 @@ export interface Context {
   registerFilter: (filter: Filter) => void
   registerFormat: (format: Format) => void
   registerTransform: (transform: Transform) => void
+  registerPreset: (preset: Preset) => void
 }
 
 export interface ContextValue {
@@ -18,6 +19,10 @@ export interface ContextValue {
    * List of registered filters.
    */
   filters: Map<string, Filter>
+  /**
+   * List of registered presets.
+   */
+  presets: Map<string, Preset>
 }
 
 export interface Format<T = any> {
@@ -34,6 +39,11 @@ export interface Transform {
 export interface Filter {
   name: string
   matcher: (params: { token: Token; context?: Record<string, any> }) => boolean
+}
+
+export interface Preset {
+  name: string
+  transforms: string[]
 }
 
 export type TokenValue = string | number | boolean

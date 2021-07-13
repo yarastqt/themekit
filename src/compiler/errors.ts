@@ -16,6 +16,12 @@ export class NotFoundTransformException extends Error {
   }
 }
 
+export class NotFoundPresetException extends Error {
+  constructor(preset: string) {
+    super(`Cannot find preset "${preset}", please check config.`)
+  }
+}
+
 export class CircularRefsException extends Error {
   constructor(refs: string[]) {
     super(`Found circular reference "${refs.join(' -> ')}", please check tokens.`)

@@ -2,6 +2,7 @@ import type { ContextValue, Token } from '../types'
 import {
   NotFoundFilterException,
   NotFoundFormatException,
+  NotFoundPresetException,
   NotFoundTransformException,
 } from './errors'
 import type { Options } from './types'
@@ -28,7 +29,17 @@ export function preprocessTokens(options: PreprocessorOptions, context: ContextV
 
   for (const output of Object.entries(options.output)) {
     const [name, config] = output
-    const { transforms, files } = config
+    const { transforms = [], files, preset: presetName } = config
+
+    if (presetName) {
+      const preset = context.presets.get(presetName)
+
+      if (!preset) {
+        throw new NotFoundPresetException(presetName)
+      }
+
+      transforms.push(...preset.transforms)
+    }
 
     result[name] = []
 

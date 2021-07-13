@@ -5,6 +5,7 @@ export function createContext(): Context {
     filters: new Map(),
     formats: new Map(),
     transforms: new Map(),
+    presets: new Map(),
   }
 
   return {
@@ -17,6 +18,9 @@ export function createContext(): Context {
     },
     registerTransform: (transform) => {
       context.transforms.set(transform.name, transform)
+    },
+    registerPreset: (preset) => {
+      context.presets.set(preset.name, preset)
     },
   }
 }

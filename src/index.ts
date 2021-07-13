@@ -9,3 +9,4 @@ export const compile = createCompiler(context.value)
 export const registerFilter = context.registerFilter
 export const registerFormat = context.registerFormat
 export const registerTransform = context.registerTransform
+export const registerPreset = context.registerPreset

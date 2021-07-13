@@ -19,9 +19,13 @@ export interface File {
 
 export interface Output {
   /**
+   * Preset with predefined transforms.
+   */
+  preset?: string
+  /**
    * List of transforms.
    */
-  transforms: string[]
+  transforms?: string[]
   /**
    * List of result files.
    */

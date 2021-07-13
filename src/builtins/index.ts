@@ -8,6 +8,8 @@ import { transformValueWithColorFn } from './value-color-function-transform'
 // All builtin filters.
 import { isValueColorFilter } from './is-value-color-filter'
 import { isValueNotColorFilter } from './is-value-not-color-filter'
+// All builtin presets.
+import { cssPreset } from './css-preset'
 
 export function registerBuiltins(context: Context) {
   // Register builins formats.
@@ -20,4 +22,7 @@ export function registerBuiltins(context: Context) {
   // Register builins filters.
   context.registerFilter(isValueColorFilter)
   context.registerFilter(isValueNotColorFilter)
+
+  // Register builins presets.
+  context.registerPreset(cssPreset)
 }
