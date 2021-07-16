@@ -15,7 +15,7 @@ export type CompileResult = PreprocessorResult
 export function createCompiler(context: ContextValue) {
   return function compile(options: CompileOptions) {
     const tokens = compileTokens(options.tokens)
-    const result = preprocessTokens({ ...options, tokens }, context)
+    const result = preprocessTokens({ ...options, context: options.context ?? {}, tokens }, context)
 
     return result
   }
