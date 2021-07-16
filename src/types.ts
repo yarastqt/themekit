@@ -53,6 +53,10 @@ export interface RawToken {
   comment?: string
 }
 
+export interface DeepRawToken {
+  [key: string]: RawToken | DeepRawToken
+}
+
 export interface TokenBase extends RawToken {
   name: string
   value: TokenValue

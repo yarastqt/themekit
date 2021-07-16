@@ -1,14 +1,16 @@
-import type { ContextValue, RawToken } from '../types'
+import type { ContextValue, DeepRawToken } from '../types'
 import { compileTokens } from './tokens-compiler'
-import { preprocessTokens } from './tokens-preprocessor'
+import { PreprocessorResult, preprocessTokens } from './tokens-preprocessor'
 import type { Options } from './types'
 
 export interface CompileOptions extends Options {
   /**
    * List of raw tokens.
    */
-  tokens: RawToken[]
+  tokens: DeepRawToken[]
 }
+
+export type CompileResult = PreprocessorResult
 
 export function createCompiler(context: ContextValue) {
   return function compile(options: CompileOptions) {
