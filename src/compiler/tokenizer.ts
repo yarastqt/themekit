@@ -1,4 +1,4 @@
-import type { Token, TokenBase } from '../types'
+import type { Token } from '../types'
 import { isObject } from '../utils/is-object'
 
 /**
@@ -18,19 +18,15 @@ export function tokenize(
 
   for (const key in tokens) {
     if (isObject(tokens[key]) && tokens[key].value) {
-      const token: TokenBase = {
+      result.push({
         attributes: {},
         comment: tokens[key].comment,
         name: '',
         path: [...context, key],
         refs: [],
         value: tokens[key].value,
-      }
-
-      result.push({
-        ...token,
         original: {
-          value: token.value,
+          value: tokens[key].value,
         },
       })
     } else {
