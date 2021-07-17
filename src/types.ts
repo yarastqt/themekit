@@ -68,6 +68,7 @@ export interface RawToken {
   comment?: string
 }
 
+// TODO: подумать над неймингом, чтот не особо
 export interface DeepRawToken {
   [key: string]: RawToken | DeepRawToken
 }
