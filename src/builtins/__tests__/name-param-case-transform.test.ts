@@ -1,9 +1,9 @@
 import type { Token } from '../../types'
-import { transformNameToKebabCase } from '../name-kebab-transform'
+import { transformNameToParamcase } from '../name-param-case-transform'
 
-describe('name-kebab-transform', () => {
+describe('transformNameToParamcase', () => {
   test('should return name with kebab-case', () => {
-    const result = transformNameToKebabCase.transformer({
+    const result = transformNameToParamcase.transformer({
       token: { path: ['token1', 'group', 'nestedPath'] } as Token,
     })
     expect(result).toBe('token1-group-nested-path')

@@ -4,7 +4,6 @@ import merge from 'deepmerge'
 
 import { resolveFrom } from './path-resolver'
 import { findPackageRoot } from './package-resolver'
-// import { Platforms } from './platforms'
 
 type Platforms = any
 
@@ -13,7 +12,6 @@ export function loadTheme(source: string, root: string = process.cwd()): OutputT
   let derivedTheme: OutputTheme = {
     mappers: [],
     sources: [],
-    whitepaper: {},
     platforms: ['common'],
   }
   const theme: InputTheme = readJsonSync(source)
@@ -39,11 +37,6 @@ export function loadTheme(source: string, root: string = process.cwd()): OutputT
     derivedTheme.mappers.push(...theme.mappers.map((filePath) => join(packageRootPath, filePath)))
   }
 
-  // TODO: Deprecated
-  // if (theme.whitepaper !== undefined) {
-  //   derivedTheme.whitepaper = { ...derivedTheme.whitepaper, ...theme.whitepaper }
-  // }
-
   for (const source of theme.sources) {
     // Makes array of arrays with each source for save order after glob.
     derivedTheme.sources.push([resolve(packageRootPath, source)])
@@ -56,7 +49,6 @@ export function loadTheme(source: string, root: string = process.cwd()): OutputT
 type InputTheme = {
   mappers: string[]
   sources: string[]
-  whitepaper: Record<string, string>
   platforms: Platforms[]
   extends?: string
 }
@@ -65,6 +57,5 @@ type OutputTheme = {
   mappers: string[]
   // Uses nested array with paths, cuz glob not save orders with using patterns for path.
   sources: string[][]
-  whitepaper: Record<string, string>
   platforms: Platforms[]
 }

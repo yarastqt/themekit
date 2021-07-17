@@ -4,7 +4,7 @@ import type { Context } from '../types'
 import { formatToCssVariables } from './css-variables-format'
 import { formatToFlatJson } from './flat-json-format'
 // All builtin transformers.
-import { transformNameToKebabCase } from './name-kebab-transform'
+import { transformNameToParamcase } from './name-param-case-transform'
 import { transformValueWithColorFn } from './value-color-function-transform'
 import { transformNameWithMapper } from './name-mapper-transform'
 // All builtin filters.
@@ -19,7 +19,7 @@ export function registerBuiltins(context: Context) {
   context.registerFormat(formatToFlatJson)
 
   // Register builins transforms.
-  context.registerTransform(transformNameToKebabCase)
+  context.registerTransform(transformNameToParamcase)
   context.registerTransform(transformValueWithColorFn)
   context.registerTransform(transformNameWithMapper)
 
