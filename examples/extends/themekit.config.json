@@ -9,7 +9,10 @@
       "files": [
         {
           "destination": "[entry]/[platform]/root.css",
-          "format": "css/variables"
+          "format": "css/variables",
+          "options": {
+            "useComments": true
+          }
         }
       ]
     }

@@ -1,8 +1,23 @@
 export interface Context {
+  /**
+   *
+   */
   value: ContextValue
+  /**
+   *
+   */
   registerFilter: (filter: Filter) => void
+  /**
+   *
+   */
   registerFormat: (format: Format) => void
+  /**
+   *
+   */
   registerTransform: (transform: Transform) => void
+  /**
+   *
+   */
   registerPreset: (preset: Preset) => void
 }
 

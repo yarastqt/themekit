@@ -1,16 +1,14 @@
-import { resolve } from 'path'
+import fs from 'fs-extra'
+import { resolve, join } from 'path'
 import { Command, flags } from '@oclif/command'
-import { watch } from 'chokidar'
 import chalk from 'chalk'
 
-import { Config } from '../core/config'
-import { loadConfig } from '../core/config'
-import { build } from '../core/build'
-import { loadTheme } from '../core/loadTheme'
-import { debounce, flatten } from '../core/utils'
-import { buildFiles } from '../core/buildFiles'
-import { Data, Platforms } from '../core/types'
-import { loadData } from '../core/loadData'
+import { compile } from '../index'
+import { loadConfig } from './utils/config-loader'
+import { loadTheme } from './utils/theme-loader'
+import { loadSources } from './utils/source-loader'
+import { loadMapper } from './utils/mapper-loader'
+import { watch } from './utils/watcher'
 
 type Flags = {
   config: string
@@ -45,104 +43,68 @@ export default class Build extends Command {
   }
 
   async run() {
-    const { flags } = this.parse<Flags, any>(Build)
-    const config = await loadConfig(resolve(flags.config), {
-      entries: flags.entry,
-      outputs: flags.output,
-    })
+    // TODO: вернуть фильтрацию конфига
+    const { flags } = this.parse<Flags, never>(Build)
+    // TODO: resolve from cwd?
+    const { entry, output } = loadConfig(resolve(flags.config))
 
-    const data = await this.loadData(config)
-
-    if (!data) {
-      return
-    }
-
-    const result = await this.build(data)
-
-    if (!result) {
-      return
-    }
-
-    await this.buildFiles(result)
+    // компиляцию можно распаралелить
+    // TODO: проверить как будет работать асинхронно и синхронно
+    this.build(entry, output)
 
     if (flags.watch) {
-      this.emitWatching()
+      // TODO: move to utils or method?
+      const sources = []
 
-      const themes = []
-      let isShutdown = false
-
-      for (const key in config.entry) {
-        const theme = await loadTheme(config.entry[key])
-        themes.push(...theme.mappers, ...flatten(theme.sources))
+      for (const entryName in entry) {
+        const theme = loadTheme(entry[entryName])
+        sources.push(...theme.mappers.flat(), ...theme.sources.flat())
       }
 
-      const watcher = watch(themes, { ignoreInitial: true })
-      const onChange = debounce(async () => {
-        if (!isShutdown) {
-          this.clear()
-          await this.build(config)
-          this.emitWatching()
+      watch(sources, () => {
+        this.build(entry, output)
+      })
+    }
+  }
+
+  async catch(error) {
+    // TODO: тут можно не делать exit1, но сперва стоит написать что фейл билда а затем кинуть ошибку
+    console.error(chalk.red(error.stack))
+    console.log(`>---------------- ${chalk.red('Build failed')} -----------------<`)
+    process.exit(1)
+  }
+
+  // TODO: check failed build
+  private build(entry, output) {
+    // TODO: started не нужно
+    console.log(`>---------------- ${chalk.green('Build started')} ----------------<`)
+
+    for (const entryName in entry) {
+      const theme = loadTheme(entry[entryName])
+      const mapper = loadMapper(theme.mappers)
+
+      for (const platform of theme.platforms) {
+        const tokens = loadSources(theme.sources, platform) as any
+        const result = compile({ tokens, output, context: { entry: entryName, platform, mapper } })
+
+        for (const [outputName, files] of Object.entries(result)) {
+          for (const file of files) {
+            // TODO: move to utils?
+            const destination = file.destination
+              .replace(/\[entry\]/g, entryName)
+              .replace(/\[platform\]/g, platform)
+              // Remove common level, because is root.
+              .replace(/common\/?/g, '')
+
+            const filePath = join(process.cwd(), output[outputName].buildPath, destination)
+            // console.log('>>> filePath', destination)
+            fs.writeFile(filePath, file.content)
+            console.log(`⚡️ ${destination}`)
+          }
         }
-      }, 500)
-
-      watcher
-        .on('unlink', onChange)
-        .on('add', onChange)
-        .on('change', onChange)
-
-      const shutdown = () => {
-        isShutdown = true
-        console.log('\nShutting down watch')
-        watcher.close()
       }
-
-      process.once('SIGINT', shutdown)
-      process.once('SIGTERM', shutdown)
     }
-  }
 
-  private async loadData(config: Config): Promise<Data | undefined> {
-    try {
-      return await loadData(config)
-    } catch (error) {
-      console.log('\r')
-      console.log(error)
-      console.log(`\n>---------------- ${chalk.red('Data loading failed')} -----------------<`)
-    }
-  }
-
-  private async build(config: any): Promise<Platforms | undefined> {
-    console.log(`>---------------- ${chalk.yellow('Build started')} ----------------<`)
-    try {
-      const result = await build(config)
-      console.log(`\n>--------------- ${chalk.green('Build completed')} ---------------<\n\n`)
-      return result
-    } catch (error) {
-      console.log('\r')
-      console.log(error)
-      console.log(`\n>---------------- ${chalk.red('Build failed')} -----------------<`)
-    }
-  }
-
-  private async buildFiles(platforms: Platforms) {
-    console.log(`\n>---------------- ${chalk.yellow('Files build started')} ----------------<`)
-    try {
-      for (let { dictionary, platform } of Object.values(platforms)) {
-        buildFiles(dictionary, platform)
-      }
-      console.log(`\n>--------------- ${chalk.green('Files build completed')} ---------------<\n\n`)
-    } catch (error) {
-      console.log('\r')
-      console.log(error)
-      console.log(`\n>---------------- ${chalk.red('Files build failed')} -----------------<`)
-    }
-  }
-
-  private emitWatching() {
-    console.log('\nWatching for changes...')
-  }
-
-  private clear() {
-    console.clear()
+    console.log(`>--------------- ${chalk.green('Build completed')} ---------------<\n`)
   }
 }

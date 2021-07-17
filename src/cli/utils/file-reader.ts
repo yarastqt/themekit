@@ -4,7 +4,10 @@ import { readFileSync } from 'fs-extra'
 import { parse as parseYaml } from '../../parsers/yaml-parser'
 import { parse as parseJson } from '../../parsers/json-parser'
 
-export function readFile(path: string) {
+/**
+ *
+ */
+export function readFile<T>(path: string): T {
   const source = readFileSync(path, 'utf8')
 
   switch (extname(path)) {

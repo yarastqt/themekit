@@ -1,0 +1,8 @@
+{
+  "watch": ["src2", "check"],
+  "ext": "ts,json",
+  "exec": "ts-node ./check/index.ts",
+  "events": {
+    "start": "echo \"\\x1Bc\""
+  }
+}

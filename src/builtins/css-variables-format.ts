@@ -1,5 +1,7 @@
 import type { Format, Token } from '../types'
 
+type OnCreateSelector = (params: any) => string
+
 interface CssVariablesFormatOptions {
   /**
    * Custom css selector.
@@ -33,6 +35,7 @@ export const formatToCssVariables: Format<CssVariablesFormatOptions> = {
     const { selector: originalSelector, ...otherOptions } = { ...defaultOptions, ...options }
     const { entry, platform } = context
 
+    // call default create selector with replacer
     const selector = originalSelector
       .replace(/\[entry\]/g, entry)
       .replace(/\[platform\]/g, platform)

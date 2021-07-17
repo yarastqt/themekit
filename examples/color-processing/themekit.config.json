@@ -4,9 +4,8 @@
   },
   "output": {
     "css": {
-      "transforms": ["name/cti/kebab"],
+      "transforms": ["name/cti/kebab", "value/color-function"],
       "buildPath": "./themes",
-      "actions": ["process-color"],
       "files": [
         {
           "destination": "[entry]/[platform]/root.css",
