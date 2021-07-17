@@ -1,9 +1,11 @@
+import { dotCase } from 'change-case'
+
 import type { Token, TokenValue } from '../types'
 import { isAlias } from '../utils/is-alias'
 import { createRef } from '../utils/ref'
-import { CircularRefsException } from './errors'
+import { CircularRefsException, NotFoundRefException } from './errors'
 
-const tokensRef = createRef()
+const tokensRef = createRef<Token[]>()
 // Use map for cache tokens (get token with O(1) operations) indexes with path as key.
 const indexCache = new Map<string, string>()
 
@@ -17,8 +19,7 @@ export function resolveTokensAliases(tokens: Token[]): Token[] {
   tokensRef.current = tokens
 
   for (const index in tokens) {
-    // TODO: Create key and resolve without value postfix.
-    const key = tokens[index].path.concat('value').join('.')
+    const key = createCacheKey(tokens[index].path)
     indexCache.set(key, index)
   }
 
@@ -33,11 +34,22 @@ export function resolveTokensAliases(tokens: Token[]): Token[] {
   return tokens
 }
 
+function createCacheKey(path: string[]) {
+  return (
+    path
+      // Use dot-case for normalize key to resolve aliases with few cases.
+      .map((chunk) => dotCase(chunk))
+      // TODO: Create key and resolve without value postfix.
+      .concat('value')
+      .join('.')
+  )
+}
+
 function resolveValueAliases(value: TokenValue, visited = new Set<string>()) {
   const result = { value, refs: [] }
 
   let aliasRegExp = /{([^}]+)}/g
-  let matches
+  let matches: RegExpExecArray
 
   while ((matches = aliasRegExp.exec(String(value))) !== null) {
     const [match, alias] = matches
@@ -49,6 +61,10 @@ function resolveValueAliases(value: TokenValue, visited = new Set<string>()) {
     }
 
     const refToken = tokensRef.current[indexCache.get(alias)]
+
+    if (!refToken) {
+      throw new NotFoundRefException(alias)
+    }
 
     if (isAlias(refToken.value)) {
       const compileResult = resolveValueAliases(refToken.value, visited)

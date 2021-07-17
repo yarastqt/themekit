@@ -1,4 +1,4 @@
-import { CircularRefsException } from '../errors'
+import { CircularRefsException, NotFoundRefException } from '../errors'
 import { compileTokens } from '../tokens-compiler'
 
 describe('tokens-compiler', () => {
@@ -48,6 +48,33 @@ describe('tokens-compiler', () => {
       compileTokens(tokens)
     } catch (error) {
       expect(error instanceof CircularRefsException).toBeTruthy()
+    }
+  })
+
+  test('should resolve token value from nested path (dot-case)', () => {
+    const tokens = [
+      { token1: { value: '{token2.nested.value}' } },
+      { token2: { nested: { value: 'value-2' } } },
+    ]
+    const result = compileTokens(tokens)
+    expect(result[0]).toHaveProperty('value', 'value-2')
+  })
+
+  test('should resolve token value from nested path (camel-case)', () => {
+    const tokens = [
+      { token1: { value: '{token2.nested.value}' } },
+      { token2Nested: { value: 'value-2' } },
+    ]
+    const result = compileTokens(tokens)
+    expect(result[0]).toHaveProperty('value', 'value-2')
+  })
+
+  test('should throw error when reference not found', () => {
+    try {
+      const tokens = [{ token1: { value: '{token2.value}' } }]
+      compileTokens(tokens)
+    } catch (error) {
+      expect(error instanceof NotFoundRefException).toBeTruthy()
     }
   })
 })

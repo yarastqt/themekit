@@ -22,6 +22,12 @@ export class NotFoundPresetException extends Error {
   }
 }
 
+export class NotFoundRefException extends Error {
+  constructor(ref: string) {
+    super(`Cannot find ref "${ref}".`)
+  }
+}
+
 export class CircularRefsException extends Error {
   constructor(refs: string[]) {
     super(`Found circular reference "${refs.join(' -> ')}", please check tokens.`)
