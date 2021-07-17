@@ -1,4 +1,4 @@
-import type { Token } from '../types'
+import type { DeepRawToken, Token } from '../types'
 import { deepMerge } from '../utils/deep-merge'
 import { tokenize } from './tokenizer'
 import { resolveTokensAliases } from './tokens-resolver'
@@ -9,10 +9,11 @@ import { resolveTokensAliases } from './tokens-resolver'
  * @param tokens - Input tokens.
  * @returns Compiled tokens.
  */
-export function compileTokens(tokens: any[]): Token[] {
-  tokens = deepMerge(tokens)
-  tokens = tokenize(tokens)
-  tokens = resolveTokensAliases(tokens)
+export function compileTokens(tokens: DeepRawToken[]): Token[] {
+  let compiledTokens: Token[] = tokens as any[]
+  compiledTokens = deepMerge(compiledTokens)
+  compiledTokens = tokenize(compiledTokens)
+  compiledTokens = resolveTokensAliases(compiledTokens)
 
-  return tokens
+  return compiledTokens
 }
